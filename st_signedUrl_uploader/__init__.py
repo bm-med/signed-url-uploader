@@ -28,18 +28,25 @@ def generate_signed_url(credentials, blob, method="PUT"):
     return signed_url
 
 
-def signedUrl_uploader(storage_client, credentials, bucket_name, key='1'):
-
+def signedUrl_uploader(storage_client, credentials, bucket_name, key='1', title="rfp"):
+    st.spinner("Uploading file...")
+    # Display the title
+    if title:
+        st.text(title)
     bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob("signedUrl file")
+    blob = bucket.blob("Latest_" + title )
     signed_url = generate_signed_url(credentials, blob)
     files_data = _component_func(signed_url=signed_url,key=key)
+    print(f"this is the {title} file name : {files_data}")
     if files_data:
         while not blob.exists() :
-            time.sleep(1)
-        new_blob = bucket.rename_blob(blob, files_data['filename'])
-        new_blob.content_type = files_data['content_type']
-        new_blob.patch()        
+            print(f"waiting for blob creation")
+            time.sleep(10)
+        print(f"this is the blob name: {blob.name}")
+        # new_blob = bucket.rename_blob(blob, files_data['filename'])
+        blob.content_type = files_data['content_type']
+        print(f"blob modified")
+        blob.patch()
         st.toast('File Uploaded Successfully !', icon='🤩')
 
     return files_data

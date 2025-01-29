@@ -34,16 +34,19 @@ def signedUrl_uploader(storage_client, credentials, bucket_name, key='1', title=
     if title:
         st.text(title)
     bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob("Latest_" + title )
+    blob = bucket.blob("Latest_" + title +".pdf")
     signed_url = generate_signed_url(credentials, blob)
     files_data = _component_func(signed_url=signed_url,key=key)
     print(f"this is the {title} file name : {files_data}")
     if files_data:
-        while not blob.exists() :
+        while not blob.exists():
             print(f"waiting for blob creation")
-            time.sleep(10)
-        print(f"this is the blob name: {blob.name}")
-        # new_blob = bucket.rename_blob(blob, files_data['filename'])
+            time.sleep(3)
+        # if files_data["filename"].endswith('.pdf'):
+        #     new_blob = bucket.rename_blob(blob, blob.name+'.pdf')
+        # else:
+        #     new_blob = bucket.rename_blob(blob, blob.name+'.pptx')
+        # new_blob = bucket.rename_blob(blob, files_data["filename"])
         blob.content_type = files_data['content_type']
         print(f"blob modified")
         blob.patch()
